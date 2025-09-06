@@ -118,19 +118,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Azure login using a Service Principal secret (JSON)
+    # Azure login using a Service Principal secret
     - name: Azure Login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }} # JSON: clientId, clientSecret, subscriptionId, tenantId
+        creds: ${{ secrets.AZURE_CREDENTIALS }} # Needs to be set as a GitHub Secret (Service Principal JSON)
 
     # Login to Azure Container Registry (ACR)
     - name: Login to Azure Container Registry
-      shell: bash
-      run: |
-        REG_NAME="${ACR_LOGIN_SERVER%%.*}"   # extract 'week07acr123' from 'week07acr123.azurecr.io'
-        echo "Logging into ACR: $REG_NAME"
-        az acr login --name "$REG_NAME"
+      run: az acr login --name ${{ env.ACR_LOGIN_SERVER }}
 
     # Build and Push Docker image for Product Service
     - name: Build and Push Product Service Image
@@ -148,7 +144,3 @@ jobs:
     - name: Logout from Azure
       run: az logout
       if: always()
-
-
-# trigerring backend for task 7.1P
-  
